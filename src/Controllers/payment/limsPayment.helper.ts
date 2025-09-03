@@ -670,7 +670,9 @@ const checkDistrictWiseLimitStatus = async (
             })}`
         );
 
-        const validDistList = await DistrictPaymentLimitModel.findOne({ name: dist });
+        const validDistList = await DistrictPaymentLimitModel.findOne({
+            name: dist,
+        });
 
         if (!validDistList) {
             return {
@@ -732,7 +734,62 @@ const checkDistrictWiseLimitStatus = async (
         };
     }
 };
+const checkDesignation = async (dsesignation: string, PostmortemID: string) => {
+    try {
+        logger.info(
+            `check Designation: ${JSON.stringify({
+                dsesignation,
+                PostmortemID,
+            })}`
+        );
 
+        const data = await PaymentModel.aggregate([
+            {
+                $match: {
+                    PostmortemID: PostmortemID,
+                    'payingTo.designation': dsesignation, // fixed spelling + quotes
+                },
+            },
+            {
+                $addFields: {
+                    lastStatus: { $arrayElemAt: ['$status', -1] }, // properly closed
+                },
+            },
+            {
+                $match: {
+                    'lastStatus.status': 'Success',
+                },
+            },
+        ]);
+
+        const exists = data.length > 0;
+        if(exists){
+            return {
+            error: true,
+            message: `This peopel already got the reward`,
+        };
+        }
+        else{
+             return {
+            error: false,
+            message: `checked not given the reward`,
+        };
+        }
+       
+    } catch (err: any) {
+        console.log(err?.response);
+        console.log(`api response data: ${err?.response?.data}`);
+        logger.error(
+            `Error in checkPaymentLimitStatus utils function: ${err?.message}`
+        );
+        logger.error(
+            `Error in checkPaymentLimitStatus utils function: ${JSON.stringify({
+                err,
+            })}`
+        );
+        throw err;
+    }
+};
 export const paymentHelper = {
     makeBulkPayment,
     getGraphDataHelper,
@@ -743,6 +800,7 @@ export const paymentHelper = {
     paymentReportExcelHelper,
     groupedPaymentReportExcelHelper,
     checkDistrictWiseLimitStatus,
+    checkDesignation,
 
     // decryptSbiResponse
 };

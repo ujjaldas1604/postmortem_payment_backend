@@ -52,7 +52,7 @@ const upiPaymentController = async (
             phoneNo,
             email,
             remarks,
-            informationId,
+            PostmortemID,
             paymentMethod,
         } = req.body;
 
@@ -132,7 +132,22 @@ const upiPaymentController = async (
         }else{
             logger.info(limit3.message);
         }
-
+        const limit4 = await paymentHelper.checkDesignation(
+            rewardedBy.designation.trim(),
+            PostmortemID
+        );
+        if (limit4.error) {
+            logger.error(`Error in upiPaymentController: ${limit3.message}`);
+            res.status(400).json(
+                paymentHelper.encryptPaymentResponse({
+                    error: true,
+                    message: limit3.message,
+                })
+            );
+            return;
+        }else{
+            logger.info(limit3.message);
+        }
         await PaymentModel.create({
             id: generateUtils.generateID('PAY'),
             requestBy: req.apiUser.id,
@@ -171,7 +186,7 @@ const upiPaymentController = async (
             ],
             payloadRefId: payloadRefId,
             paymentRefNo: paymentRefNo,
-            informationId: informationId,
+            PostmortemID: PostmortemID,
             ...(config.NODE_ENV !== 'prod' && { staging: true }),
             remarks: remarks,
             ...(districtId && { districtId }),
@@ -494,8 +509,8 @@ const upiPaymentController = async (
                         );
 
                         formData.append(
-                            'infoId',
-                            informationId
+                            'PostmortemID',
+                            PostmortemID
                         )
 
                         logger.info('Initiating payment resolve status update to lims');

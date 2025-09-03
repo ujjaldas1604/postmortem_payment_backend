@@ -2,7 +2,7 @@ import express from 'express';
 import { paymentController } from '../../../Controllers/payment/limsPayment.controller';
 import { paymentValidators } from '../../../validators/payment.validators';
 import checkValidationErrors, { checkValidationErrorsWithEncryptedResponse } from '../../../middleware/validation.middleware';
-import { payloadDecryptionMiddleware } from 'src/middleware/payloadDecryption.middleware';
+import { payloadDecryptionMiddleware } from './../../../middleware/payloadDecryption.middleware'
 import paymentAuthorizationValidationMiddleware from '../../../middleware/paymentAuthorizationValidation.middleware';
 import adminAuthorizationMiddleware from '../../../middleware/adminAuthorization.middleware';
 // import adminAuthorizationMiddleware from '../../../middleware/adminAuthorization.middleware';

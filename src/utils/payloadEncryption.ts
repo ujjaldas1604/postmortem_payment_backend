@@ -1,4 +1,4 @@
-import logger from 'src/config/winston_logger';
+import logger from './../config/winston_logger'
 import crypto from 'crypto';
 import path from 'path';
 import { readFileSync } from 'fs';

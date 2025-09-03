@@ -39,7 +39,7 @@ interface IPayments extends Document {
     // CMPReferenceNo?: string;
     UTR?: string;
     processedDate?: Date;
-    informationId: string;
+    PostmortemID: string;
     created_at?: Date;
 }
 
@@ -51,18 +51,21 @@ const PaymentSchema = new Schema<IPayments>({
         required: true,
     },
     payingFrom: {
-        wbpId: { type: String, required: false },
+        id: { type: String, required: true },
         name: { type: String, required: true },
         designation: { type: String, required: false },
-        // phoneNo: { type: String, required: true },
-        // emailId: { type: String, required: true },
-        accountNo: { type: String, required: false },
     },
     payingTo: {
-        wbpId: { type: String, required: true },
         name: { type: String, required: true },
-        designation: { type: String, required: false },
-        // phoneNo: { type: String, required: true },
+        designation: {
+            type: String,
+            enum: [
+                'Doctor',
+                'Dom',
+                'Civic',
+            ],
+            required: false,
+        },
         accountNo: { type: String, required: false },
         upi: { type: String, required: false },
         ifsc: { type: String, required: false },
@@ -87,10 +90,10 @@ const PaymentSchema = new Schema<IPayments>({
     phoneNo: { type: String },
     remarks: { type: String },
     districtId: { type: String, required: false },
-    informationId: { type: String, required: true },
+    PostmortemID: { type: String, required: true },
     created_at: { type: Date, default: Date.now },
 });
 
-PaymentSchema.index({payloadRefId: 1});
+PaymentSchema.index({ payloadRefId: 1 });
 
 export const PaymentModel = model<IPayments>('Payment', PaymentSchema);
